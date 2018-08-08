@@ -1,0 +1,3 @@
+# debug tools
+bpython
+ipython[all]

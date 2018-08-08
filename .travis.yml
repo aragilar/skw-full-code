@@ -1,0 +1,40 @@
+language: python
+addons:
+  apt:
+    packages:
+    - gfortran
+    - liblapack-dev
+
+sudo: false
+
+cache:
+  directories:
+    - $HOME/.cache/pip
+    - $HOME/sundials
+
+#env:
+  #- TOXENV=docs
+  #- TOXENV=check-manifest
+  #- TOXENV=checkreadme
+matrix:
+  include:
+    - python: 3.6
+      env:
+      - TOXENV=py36
+    - python: 3.6
+      env:
+      - TOXENV=flake8
+    - python: 3.6
+      env:
+      - TOXENV=pylint
+
+install:
+  - source ./ci_support/ensure_sundials_installed.sh
+  - pip install -U pip setuptools wheel
+  - pip install -U tox codecov
+
+script:
+  - tox
+
+after_success:
+  - codecov

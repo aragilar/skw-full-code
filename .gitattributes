@@ -1,0 +1,2 @@
+src/skw_full_code/_version_.py export-subst
+src/skw_full_code/_version.py export-subst

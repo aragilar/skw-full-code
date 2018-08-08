@@ -1,0 +1,2 @@
+include versioneer.py
+include src/skw_full_code/_version.py

@@ -1,0 +1,11 @@
+*.log
+plot.png
+pylint_*.txt
+.coverage
+.coverage_html
+.cache
+.tox
+dist
+*.egg-info
+soln.hdf5
+.pytest_cache
