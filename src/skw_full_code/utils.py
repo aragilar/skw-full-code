@@ -138,7 +138,7 @@ MAGNETIC_INDEXES = [ODEIndex.b_r, ODEIndex.b_φ]
 VELOCITY_INDEXES = [ODEIndex.w_r, ODEIndex.w_φ]
 
 
-class SKWSolverError(Exception):
+class SKWError(Exception):
     """
     Base error class
     """

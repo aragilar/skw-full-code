@@ -11,7 +11,7 @@ from scikits.odes.sundials import (
 from scikits.odes.sundials.cvode import StatusEnum
 
 from .utils import (
-    gen_sonic_point_rootfn, error_handler, SolverError,
+    error_handler, SolverError,
 )
 
 from ..float_handling import float_type
@@ -83,33 +83,24 @@ def ode_system(*, a_0, σ_O_0, σ_P_0, σ_H_0, ρ_s, z_s):
 
 
 def main_solution(
-    *, angles, system_initial_conditions, ode_initial_conditions, γ, a_0,
-    norm_kepler_sq, relative_tolerance=float_type(1e-6),
-    absolute_tolerance=float_type(1e-10), max_steps=500, onroot_func=None,
-    find_sonic_point=False, tstop=None, ontstop_func=None, η_derivs=True,
-    store_internal=True, root_func=None, root_func_args=None,
-    θ_scale=float_type(1)
+    *, heights, initial_conditions, a_0, σ_O_0, σ_P_0, σ_H_0, ρ_s, z_s,
+    relative_tolerance=float_type(1e-6), absolute_tolerance=float_type(1e-10),
+    max_steps=500, onroot_func=None, tstop=None, ontstop_func=None,
+    root_func=None, root_func_args=None
 ):
     """
     Find solution
     """
     extra_args = {}
-    if find_sonic_point and root_func is not None:
-        raise SolverError("Cannot use both sonic point finder and root_func")
-    elif find_sonic_point:
-        extra_args["rootfn"] = gen_sonic_point_rootfn(1)
-        extra_args["nr_rootfns"] = 1
-    elif root_func is not None:
+    if root_func is not None:
         extra_args["rootfn"] = root_func
         if root_func_args is not None:
             extra_args["nr_rootfns"] = root_func_args
         else:
             raise SolverError("Need to specify size of root array")
 
-    system, internal_data = ode_system(
-        γ=γ, a_0=a_0, norm_kepler_sq=norm_kepler_sq,
-        init_con=system_initial_conditions, η_derivs=η_derivs,
-        store_internal=store_internal, with_taylor=False, θ_scale=θ_scale,
+    system = ode_system(
+        a_0=a_0, σ_O_0=σ_O_0, σ_P_0=σ_P_0, σ_H_0=σ_H_0, ρ_s=ρ_s, z_s=z_s,
     )
 
     solver = ode(
@@ -129,7 +120,7 @@ def main_solution(
     )
 
     try:
-        soln = solver.solve(angles, ode_initial_conditions)
+        soln = solver.solve(heights, initial_conditions)
     except CVODESolveFailed as e:
         soln = e.soln
         log.warn(
@@ -142,13 +133,10 @@ def main_solution(
             raise e
     except CVODESolveFoundRoot as e:
         soln = e.soln
-        if find_sonic_point:
-            log.notice("Found sonic point at {}".format(soln.roots.t))
-        else:
-            log.notice("Found root at {}".format(soln.roots.t))
+        log.notice("Found root at {}".format(soln.roots.t))
     except CVODESolveReachedTSTOP as e:
         soln = e.soln
         for tstop_scaled in soln.tstop.t:
             log.notice("Stopped at {}".format(tstop_scaled))
 
-    return soln, internal_data
+    return soln
