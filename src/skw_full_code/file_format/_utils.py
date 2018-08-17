@@ -2,8 +2,6 @@
 Utility functions for data strutures
 """
 
-from fractions import Fraction
-
 import attr
 
 from h5preserve import Registry

@@ -7,8 +7,7 @@ from h5preserve import new_registry_list
 from . import _dumpers # noqa
 from . import _loaders # noqa
 from ._containers import ( # noqa
-    Solution, SolutionInput, ConfigInput, Problems, InternalData,
-    DAEInternalData, DAEInitialConditions, Run, InitialConditions,
+    Solution, SolutionInput, ConfigInput, Run, InitialConditions,
 )
 from ._old_dict_loading import (
     dict_as_group_registry as _dict_as_group_registry

@@ -2,15 +2,11 @@
 Defines the common data structures
 """
 
-from collections import defaultdict
 from collections.abc import MutableMapping
 
 import attr
-from numpy import asarray, concatenate, zeros
 
 from h5preserve import wrap_on_demand, OnDemandWrapper, DelayedContainer
-
-from ..utils import ODEIndex
 
 
 # pylint: disable=too-few-public-methods
@@ -21,10 +17,9 @@ class Solution:
     Container for result from solver
     """
     solution_input = attr.ib()
-    angles = attr.ib()
+    heights = attr.ib()
     solution = attr.ib()
     flag = attr.ib()
-    coordinate_system = attr.ib()
     initial_conditions = attr.ib()
     t_roots = attr.ib()
     y_roots = attr.ib()
@@ -38,18 +33,17 @@ class ConfigInput:
     start = attr.ib()
     stop = attr.ib()
     max_steps = attr.ib()
-    num_angles = attr.ib()
+    num_heights = attr.ib()
     label = attr.ib()
     relative_tolerance = attr.ib()
     absolute_tolerance = attr.ib()
-    target_velocity = attr.ib()
-    split_method = attr.ib()
     v_rin_on_c_s = attr.ib()
     v_a_on_c_s = attr.ib()
-    c_s_on_v_k = attr.ib()
-    η_O = attr.ib()
-    η_H = attr.ib()
-    η_A = attr.ib()
+    σ_O_0 = attr.ib()
+    σ_P_0 = attr.ib()
+    σ_H_0 = attr.ib()
+    ρ_s = attr.ib()
+    z_s = attr.ib()
 
 
 @attr.s
@@ -57,6 +51,19 @@ class SolutionInput:
     """
     Container for parsed input for solution
     """
+    start = attr.ib()
+    stop = attr.ib()
+    max_steps = attr.ib()
+    num_heights = attr.ib()
+    relative_tolerance = attr.ib()
+    absolute_tolerance = attr.ib()
+    v_rin_on_c_s = attr.ib()
+    v_a_on_c_s = attr.ib()
+    σ_O_0 = attr.ib()
+    σ_P_0 = attr.ib()
+    σ_H_0 = attr.ib()
+    ρ_s = attr.ib()
+    z_s = attr.ib()
 
 
 class Solutions(MutableMapping):
@@ -127,7 +134,6 @@ class Run:
     config_filename = attr.ib()
     skw_full_code_version = attr.ib()
     float_type = attr.ib()
-    sonic_method = attr.ib()
     time = attr.ib(default=None)
     _final_solution = attr.ib(default=attr.Factory(DelayedContainer))
     solutions = attr.ib(default=attr.Factory(Solutions))
@@ -153,5 +159,13 @@ class InitialConditions:
     """
     Container holding the initial conditions for the solver
     """
-    pass
+    heights = attr.ib()
+    init_con = attr.ib()
+    a_0 = attr.ib()
+    σ_O_0 = attr.ib()
+    σ_P_0 = attr.ib()
+    σ_H_0 = attr.ib()
+    ρ_s = attr.ib()
+    z_s = attr.ib()
+
 # pylint: enable=too-few-public-methods
