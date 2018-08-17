@@ -10,14 +10,13 @@ import sys
 from logbook.compat import redirected_warnings, redirected_logging
 from matplotlib.colors import TABLEAU_COLORS, XKCD_COLORS
 import matplotlib.pyplot as plt
-from scipy.interpolate import interp1d
 
 from h5preserve import open as h5open
 
 from .. import __version__ as ds_version
 from ..file_format import registries
 from ..logging import log_handler, logging_options
-from ..utils import ODEIndex, str_to_float, get_solutions, SKWError
+from ..utils import str_to_float, get_solutions, SKWError
 
 
 def single_solution_plotter(func):

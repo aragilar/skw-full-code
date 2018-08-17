@@ -52,12 +52,9 @@ def mhd_wave_speeds(B, rho, sound_speed):
     """
     B_axis = 1 if B.ndim == 2 else 0
 
-    B_sq = np.sum(B**2, axis=B_axis)
+    B_sq = np.sum(B**2, axis=B_axis) + 1
 
-    if B_axis:
-        cos_sq_psi = B[:, ODEIndex.B_θ]**2 / B_sq
-    else:
-        cos_sq_psi = B[ODEIndex.B_θ]**2 / B_sq
+    cos_sq_psi = 1 / B_sq
 
     v_a_sq = B_sq / (4*pi*rho)
     slow = 1/2 * (
