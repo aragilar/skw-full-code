@@ -75,11 +75,11 @@ def get_input_from_conffile(*, config_file, overrides=None):
         ),
         v_rin_on_c_s=config.get("initial", "v_rin_on_c_s", fallback="1"),
         v_a_on_c_s=config.get("initial", "v_a_on_c_s", fallback="1"),
-        σ_O_0=config.get("initial", "σ_O_0", fallback="1"),
-        σ_P_0=config.get("initial", "σ_P_0", fallback="1"),
-        σ_H_0=config.get("initial", "σ_H_0", fallback="1"),
-        ρ_s=config.get("initial", "ρ_s", fallback="1"),
-        z_s=config.get("initial", "z_s", fallback="1"),
+        σ_O_0=config.get("initial", "σ_O_0", fallback="100"),
+        σ_P_0=config.get("initial", "σ_P_0", fallback="3"),
+        σ_H_0=config.get("initial", "σ_H_0", fallback="4"),
+        ρ_s=config.get("initial", "ρ_s", fallback="1e-6"),
+        z_s=config.get("initial", "z_s", fallback="40"),
     ))
 
 

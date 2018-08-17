@@ -9,7 +9,8 @@ PLOT_FILE = "plot.png"
 
 
 @pytest.fixture(scope="session")
-def solution_default(tmpdir):
+def solution(tmpdir_factory):
+    tmpdir = tmpdir_factory.mktemp("solution")
     return solve(
         output_dir=Path(str(tmpdir)), output_file=None, config_file=None,
     )
