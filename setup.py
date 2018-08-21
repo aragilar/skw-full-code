@@ -20,9 +20,7 @@ setuptools.setup(
         "h5py>2.5",
         "h5preserve>=0.14",
         "stringtopy",
-        "corner",
         "attrs",
-        "emcee",
     ],
     author = "James Tocknell",
     author_email = "aragilar@gmail.com",
@@ -47,6 +45,9 @@ setuptools.setup(
     #],
     entry_points = {
         'console_scripts': [
+            'skw-full-soln = skw_full_code.solve:main',
+            'skw-full-info = skw_full_code.analyse.info:info_main',
+            'skw-full-plot = skw_full_code.analyse.plot:plot_main',
         ],
     },
     cmdclass=versioneer.get_cmdclass(),

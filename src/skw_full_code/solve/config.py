@@ -38,7 +38,7 @@ def define_conditions(inp):
     init_con[ODEIndex.w_r] = - ε
     init_con[ODEIndex.w_φ] = w_φ
     init_con[ODEIndex.w_Er] = w_Er
-    init_con[ODEIndex.ln_ρ] = 1
+    init_con[ODEIndex.ln_ρ] = 0
     init_con[ODEIndex.b_r] = 0
     init_con[ODEIndex.b_φ] = 0
 
