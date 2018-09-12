@@ -1,2 +1,11 @@
 include versioneer.py
 include src/skw_full_code/_version.py
+include .coveragerc
+include pylintrc
+include *.ini
+include *.txt
+include *.md
+include *.rst
+recursive-include tests *.py
+recursive-exclude ci_support *
+

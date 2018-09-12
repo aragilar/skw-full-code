@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-
+"""
+Solver component of skw-main-code
+"""
 import argparse
 from pathlib import Path
 

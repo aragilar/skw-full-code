@@ -51,6 +51,7 @@ def plot(
     """
     Plot difference between taylor solution and skw solution
     """
+    # pylint: disable=too-many-function-args,unexpected-keyword-arg
     fig = generate_plot(
         soln, soln_range, linestyle=linestyle, stop=stop, figargs=figargs,
         title=title,
@@ -64,7 +65,6 @@ def plot(
 @single_solution_plotter
 def generate_plot(
     soln, *, linestyle='-', stop=90, figargs=None,
-    v_z_scale="linear"
 ):
     """
     Generate plot, with enough freedom to be able to format fig
@@ -133,8 +133,11 @@ def generate_plot(
 
 
 def compute_taylor(skw_config, heights, c_s_on_v_k=0.05, γ=1e-7):
+    """
+    Compute solution based on taylor series from disc-solver
+    """
     def sum_taylor(coef):
-        if len(coef) == 0:
+        if not coef:
             return 0
         if len(coef) == 1:
             return coef[0]
@@ -147,6 +150,7 @@ def compute_taylor(skw_config, heights, c_s_on_v_k=0.05, γ=1e-7):
         skw_solution[:, ODEIndex.b_φ] = solution[:, DS_ODEIndex.B_r]
         skw_solution[:, ODEIndex.b_r] = solution[:, DS_ODEIndex.B_φ]
         skw_solution[:, ODEIndex.ln_ρ] = log(solution[:, DS_ODEIndex.ρ])
+        return skw_solution
 
     σ_O_0 = skw_config.σ_O_0
     σ_P_0 = skw_config.σ_P_0
@@ -179,4 +183,6 @@ def compute_taylor(skw_config, heights, c_s_on_v_k=0.05, γ=1e-7):
         γ=γ,
         c_s_on_v_k=c_s_on_v_k,
     )
-    return sum_taylor(ds_compute_taylor_values(ds_soln_input))
+    return convert_ds_solution(
+        sum_taylor(ds_compute_taylor_values(ds_soln_input))
+    )

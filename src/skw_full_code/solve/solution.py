@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+"""
+The system of odes
+"""
 import logbook
 from numpy import sqrt, exp
 from scikits.odes import ode
@@ -22,7 +25,13 @@ log = logbook.Logger(__name__)
 
 
 def ode_system(*, a_0, σ_O_0, σ_P_0, σ_H_0, ρ_s, z_s):
+    """
+    Set up the system we are solving for.
+    """
     def rhs_func(z, variables, derivs):
+        """
+        Compute the ODEs
+        """
         w_r = variables[ODEIndex.w_r]
         w_φ = variables[ODEIndex.w_φ]
         w_Er = variables[ODEIndex.w_Er]

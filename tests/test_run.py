@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from pathlib import Path
 
+import pytest
+
 from skw_full_code.solve import solve
 from skw_full_code.analyse.info import info
 from skw_full_code.analyse.plot import plot
@@ -38,18 +40,6 @@ class TestAnalysis:
             output_file=tmp_text_stream,
         )
 
-    def test_info_sonic_points(self, solution, tmp_text_stream):
-        info(
-            solution, group="sonic-points", soln_range=None,
-            output_file=tmp_text_stream,
-        )
-
-    def test_info_crosses_points(self, solution, tmp_text_stream):
-        info(
-            solution, group="crosses-points", soln_range=None,
-            output_file=tmp_text_stream,
-        )
-
     def test_info_solutions(self, solution, tmp_text_stream):
         info(
             solution, group="solutions", soln_range=None,
@@ -59,6 +49,6 @@ class TestAnalysis:
     def test_plot_show(self, solution, mpl_interactive):
         plot(solution, show=True)
 
-    #@pytest.mark.mpl_image_compare
+    @pytest.mark.mpl_image_compare
     def test_plot_file(self, solution, plot_file):
         return plot(solution, plot_filename=plot_file, close=False)
