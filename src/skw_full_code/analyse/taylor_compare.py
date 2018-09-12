@@ -125,7 +125,7 @@ def generate_plot(
 
     # only add label to bottom plots
     for ax in axes[1]:
-        ax.set_xlabel("angle from plane (°)")
+        ax.set_xlabel("z/h")
 
     axes.shape = axes.size
     for i, settings in enumerate(param_names):
@@ -161,7 +161,9 @@ def compute_taylor(skw_config, heights, c_s_on_v_k=0.05, γ=1e-7):
     def convert_ds_solution(solution):
         skw_solution = zeros([solution.shape[0], len(ODEIndex)])
         skw_solution[:, ODEIndex.w_r] = solution[:, DS_ODEIndex.v_r]
-        skw_solution[:, ODEIndex.w_φ] = solution[:, DS_ODEIndex.v_φ]
+        skw_solution[:, ODEIndex.w_φ] = solution[:, DS_ODEIndex.v_φ] - (
+            1 / c_s_on_v_k
+        )
         skw_solution[:, ODEIndex.b_φ] = solution[:, DS_ODEIndex.B_r]
         skw_solution[:, ODEIndex.b_r] = solution[:, DS_ODEIndex.B_φ]
         skw_solution[:, ODEIndex.ln_ρ] = log(solution[:, DS_ODEIndex.ρ])
