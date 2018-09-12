@@ -164,8 +164,8 @@ def compute_taylor(skw_config, heights, c_s_on_v_k=0.05, γ=1e-7):
         skw_solution[:, ODEIndex.w_φ] = solution[:, DS_ODEIndex.v_φ] - (
             1 / c_s_on_v_k
         )
-        skw_solution[:, ODEIndex.b_φ] = solution[:, DS_ODEIndex.B_r]
-        skw_solution[:, ODEIndex.b_r] = solution[:, DS_ODEIndex.B_φ]
+        skw_solution[:, ODEIndex.b_r] = solution[:, DS_ODEIndex.B_r]
+        skw_solution[:, ODEIndex.b_φ] = solution[:, DS_ODEIndex.B_φ]
         skw_solution[:, ODEIndex.ln_ρ] = log(solution[:, DS_ODEIndex.ρ])
         return skw_solution
 
