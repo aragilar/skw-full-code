@@ -6,6 +6,7 @@ import pytest
 from skw_full_code.solve import solve
 from skw_full_code.analyse.info import info
 from skw_full_code.analyse.plot import plot
+from skw_full_code.analyse.taylor_compare import plot as taylor_compare_plot
 
 
 class TestSolve:
@@ -52,3 +53,12 @@ class TestAnalysis:
     @pytest.mark.mpl_image_compare
     def test_plot_file(self, solution, plot_file):
         return plot(solution, plot_filename=plot_file, close=False)
+
+    def test_taylor_compare_plot_show(self, solution, mpl_interactive):
+        taylor_compare_plot(solution, show=True)
+
+    @pytest.mark.mpl_image_compare
+    def test_taylor_compare_plot_file(self, solution, plot_file):
+        return taylor_compare_plot(
+            solution, plot_filename=plot_file, close=False
+        )

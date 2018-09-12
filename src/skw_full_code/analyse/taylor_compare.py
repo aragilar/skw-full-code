@@ -2,7 +2,7 @@
 """
 Plot command for DiscSolver
 """
-from numpy import zeros, log
+from numpy import zeros, log, outer, ones, newaxis
 import matplotlib.pyplot as plt
 
 from disc_solver.file_format import SolutionInput as DSSolutionInput
@@ -26,7 +26,19 @@ def plot_parser(parser):
     Add arguments for plot command to parser
     """
     common_plotting_options(parser)
+    parser.add_argument("--c_s_on_v_k", type=float, default=0.05)
+    parser.add_argument("--γ", type=float, default=1e-7)
     return parser
+
+
+def get_plot_args(args):
+    """
+    Parse plot args
+    """
+    return {
+        "c_s_on_v_k": args.get("c_s_on_v_k", 0.05),
+        "γ": args.get("γ", 1e-7),
+    }
 
 
 @analyse_main_wrapper(
@@ -34,6 +46,7 @@ def plot_parser(parser):
     plot_parser,
     cmd_parser_splitters={
         "common_plot_args": get_common_plot_args,
+        "plot_args": get_plot_args,
     }
 )
 def plot_main(soln, *, soln_range, common_plot_args, plot_args):
@@ -46,7 +59,7 @@ def plot_main(soln, *, soln_range, common_plot_args, plot_args):
 @analysis_func_wrapper
 def plot(
     soln, *, soln_range=None, plot_filename=None, show=False, linestyle='-',
-    stop=90, figargs=None, title=None, close=True
+    stop=90, figargs=None, title=None, close=True, c_s_on_v_k=0.05, γ=1e-7
 ):
     """
     Plot difference between taylor solution and skw solution
@@ -54,7 +67,7 @@ def plot(
     # pylint: disable=too-many-function-args,unexpected-keyword-arg
     fig = generate_plot(
         soln, soln_range, linestyle=linestyle, stop=stop, figargs=figargs,
-        title=title,
+        title=title, γ=γ, c_s_on_v_k=c_s_on_v_k,
     )
 
     return plot_output_wrapper(
@@ -64,7 +77,7 @@ def plot(
 
 @single_solution_plotter
 def generate_plot(
-    soln, *, linestyle='-', stop=90, figargs=None,
+    soln, *, linestyle='-', stop=90, figargs=None, c_s_on_v_k=0.05, γ=1e-7
 ):
     """
     Generate plot, with enough freedom to be able to format fig
@@ -77,7 +90,9 @@ def generate_plot(
 
     indexes = heights <= stop
 
-    taylor_solutions = compute_taylor(soln.solution_input, heights)
+    taylor_solutions = compute_taylor(
+        soln.solution_input, heights, γ=γ, c_s_on_v_k=c_s_on_v_k,
+    )
     diff_solution = solution - taylor_solutions
 
     param_names = [
@@ -112,7 +127,7 @@ def generate_plot(
     for ax in axes[1]:
         ax.set_xlabel("angle from plane (°)")
 
-    axes.shape = len(param_names)
+    axes.shape = axes.size
     for i, settings in enumerate(param_names):
         ax = axes[i]
         ax.plot(
@@ -138,13 +153,13 @@ def compute_taylor(skw_config, heights, c_s_on_v_k=0.05, γ=1e-7):
     """
     def sum_taylor(coef):
         if not coef:
-            return 0
+            return zeros(heights.shape)
         if len(coef) == 1:
-            return coef[0]
-        return sum_taylor(coef[1:]) * heights + coef[0]
+            return outer(ones(heights.shape), coef[0])
+        return sum_taylor(coef[1:]) * heights[:, newaxis] + coef[0]
 
     def convert_ds_solution(solution):
-        skw_solution = zeros(solution.shape[0], len(ODEIndex))
+        skw_solution = zeros([solution.shape[0], len(ODEIndex)])
         skw_solution[:, ODEIndex.w_r] = solution[:, DS_ODEIndex.v_r]
         skw_solution[:, ODEIndex.w_φ] = solution[:, DS_ODEIndex.v_φ]
         skw_solution[:, ODEIndex.b_φ] = solution[:, DS_ODEIndex.B_r]
@@ -164,7 +179,7 @@ def compute_taylor(skw_config, heights, c_s_on_v_k=0.05, γ=1e-7):
         stop=skw_config.stop,
         taylor_stop_angle=None,
         max_steps=None,
-        num_angles=None,
+        num_angles=len(heights),
         relative_tolerance=skw_config.relative_tolerance,
         absolute_tolerance=skw_config.absolute_tolerance,
         jump_before_sonic=None,
