@@ -28,6 +28,7 @@ def plot_parser(parser):
     common_plotting_options(parser)
     parser.add_argument("--c_s_on_v_k", type=float, default=0.05)
     parser.add_argument("--γ", type=float, default=1e-7)
+    parser.add_argument("--show-both", action='store_true', default=False)
     return parser
 
 
@@ -38,6 +39,7 @@ def get_plot_args(args):
     return {
         "c_s_on_v_k": args.get("c_s_on_v_k", 0.05),
         "γ": args.get("γ", 1e-7),
+        "show_both": args.get("show_both", False),
     }
 
 
@@ -59,7 +61,8 @@ def plot_main(soln, *, soln_range, common_plot_args, plot_args):
 @analysis_func_wrapper
 def plot(
     soln, *, soln_range=None, plot_filename=None, show=False, linestyle='-',
-    stop=90, figargs=None, title=None, close=True, c_s_on_v_k=0.05, γ=1e-7
+    stop=90, figargs=None, title=None, close=True, c_s_on_v_k=0.05, γ=1e-7,
+    show_both=False
 ):
     """
     Plot difference between taylor solution and skw solution
@@ -67,7 +70,7 @@ def plot(
     # pylint: disable=too-many-function-args,unexpected-keyword-arg
     fig = generate_plot(
         soln, soln_range, linestyle=linestyle, stop=stop, figargs=figargs,
-        title=title, γ=γ, c_s_on_v_k=c_s_on_v_k,
+        title=title, γ=γ, c_s_on_v_k=c_s_on_v_k, show_both=show_both,
     )
 
     return plot_output_wrapper(
@@ -77,7 +80,8 @@ def plot(
 
 @single_solution_plotter
 def generate_plot(
-    soln, *, linestyle='-', stop=90, figargs=None, c_s_on_v_k=0.05, γ=1e-7
+    soln, *, linestyle='-', stop=90, figargs=None, c_s_on_v_k=0.05, γ=1e-7,
+    show_both=False
 ):
     """
     Generate plot, with enough freedom to be able to format fig
@@ -99,22 +103,27 @@ def generate_plot(
         {
             "name": "$B_r/B_0$",
             "data": diff_solution[:, ODEIndex.b_r],
+            "index": ODEIndex.b_r,
         },
         {
             "name": "$B_φ/B_0$",
             "data": diff_solution[:, ODEIndex.b_φ],
+            "index": ODEIndex.b_φ,
         },
         {
             "name": "$v_r/c_s$",
             "data": diff_solution[:, ODEIndex.w_r],
+            "index": ODEIndex.w_r,
         },
         {
             "name": "$(v_φ - v_k)/c_s$",
             "data": diff_solution[:, ODEIndex.w_φ],
+            "index": ODEIndex.w_φ,
         },
         {
             "name": "$log(ρ/ρ_0)$",
             "data": diff_solution[:, ODEIndex.ln_ρ],
+            "index": ODEIndex.ln_ρ,
         },
     ]
 
@@ -130,20 +139,24 @@ def generate_plot(
     axes.shape = axes.size
     for i, settings in enumerate(param_names):
         ax = axes[i]
-        ax.plot(
-            heights[indexes],
-            settings["data"][indexes], linestyle, label=settings["name"]
-        )
-        for extra in settings.get("extras", []):
+        if show_both:
             ax.plot(
                 heights[indexes],
-                extra["data"][indexes],
-                label=extra.get("label")
+                solution[indexes, settings["index"]], linestyle, label="SKW"
+            )
+            ax.plot(
+                heights[indexes],
+                taylor_solutions[indexes, settings["index"]], linestyle,
+                label="Taylor"
+            )
+            ax.legend(loc=0)
+        else:
+            ax.plot(
+                heights[indexes],
+                settings["data"][indexes], linestyle, label=settings["name"]
             )
         ax.set_ylabel(settings["name"])
         ax.set_yscale(settings.get("scale", "linear"))
-        if settings.get("legend"):
-            ax.legend(loc=0)
     return fig
 
 

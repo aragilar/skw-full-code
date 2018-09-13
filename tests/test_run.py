@@ -54,6 +54,15 @@ class TestAnalysis:
     def test_plot_file(self, solution, plot_file):
         return plot(solution, plot_filename=plot_file, close=False)
 
+    def test_taylor_compare_plot_show_both(self, solution, mpl_interactive):
+        taylor_compare_plot(solution, show=True, show_both=True)
+
+    @pytest.mark.mpl_image_compare
+    def test_taylor_compare_plot_file_both(self, solution, plot_file):
+        return taylor_compare_plot(
+            solution, plot_filename=plot_file, close=False, show_both=True
+        )
+
     def test_taylor_compare_plot_show(self, solution, mpl_interactive):
         taylor_compare_plot(solution, show=True)
 
