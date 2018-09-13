@@ -125,7 +125,7 @@ def generate_plot(
 
     # only add label to bottom plots
     for ax in axes[1]:
-        ax.set_xlabel("z/h")
+        ax.set_xlabel("$z/z_s$")
 
     axes.shape = axes.size
     for i, settings in enumerate(param_names):
