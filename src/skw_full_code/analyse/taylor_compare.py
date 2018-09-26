@@ -164,12 +164,15 @@ def compute_taylor(skw_config, heights, c_s_on_v_k=0.05, γ=1e-7):
     """
     Compute solution based on taylor series from disc-solver
     """
-    def sum_taylor(coef):
+    def sum_taylor(coef, count=0):
         if not coef:
             return zeros(heights.shape)
         if len(coef) == 1:
             return outer(ones(heights.shape), coef[0])
-        return sum_taylor(coef[1:]) * heights[:, newaxis] + coef[0]
+        divisor = count if count != 0 else 1
+        return (
+            sum_taylor(coef[1:], count=count+1) * heights[:, newaxis] + coef[0]
+        ) / divisor
 
     def convert_ds_solution(solution):
         skw_solution = zeros([solution.shape[0], len(ODEIndex)])
