@@ -43,7 +43,7 @@ class ConfigInput:
     σ_P_0 = attr.ib()
     σ_H_0 = attr.ib()
     ρ_s = attr.ib()
-    z_s = attr.ib()
+    z_s = attr.ib(default=None)
 
 
 @attr.s
@@ -63,7 +63,7 @@ class SolutionInput:
     σ_P_0 = attr.ib()
     σ_H_0 = attr.ib()
     ρ_s = attr.ib()
-    z_s = attr.ib()
+    z_s = attr.ib(default=None)
 
 
 class Solutions(MutableMapping):
@@ -166,6 +166,6 @@ class InitialConditions:
     σ_P_0 = attr.ib()
     σ_H_0 = attr.ib()
     ρ_s = attr.ib()
-    z_s = attr.ib()
+    z_s = attr.ib(default=None)
 
 # pylint: enable=too-few-public-methods

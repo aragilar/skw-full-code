@@ -24,7 +24,7 @@ LINSOLVER = "dense"
 log = logbook.Logger(__name__)
 
 
-def ode_system(*, a_0, σ_O_0, σ_P_0, σ_H_0, ρ_s, z_s):
+def ode_system(*, a_0, σ_O_0, σ_P_0, σ_H_0, ρ_s):
     """
     Set up the system we are solving for.
     """
@@ -73,7 +73,7 @@ def ode_system(*, a_0, σ_O_0, σ_P_0, σ_H_0, ρ_s, z_s):
         deriv_b_φ = - j_r
         deriv_w_r = (a_0 ** 2 / ρ * j_φ + 2 * w_φ) / w_z
         deriv_w_φ = - (a_0 ** 2 / ρ * j_r + w_r / 2) / w_z
-        deriv_ln_ρ = (a_0 ** 2 / ρ * (j_r * b_φ - j_φ * b_r) - z * z_s) / (
+        deriv_ln_ρ = (a_0 ** 2 / ρ * (j_r * b_φ - j_φ * b_r) - z) / (
             (1 + w_z) * (1 - w_z)
         )
 
@@ -89,7 +89,7 @@ def ode_system(*, a_0, σ_O_0, σ_P_0, σ_H_0, ρ_s, z_s):
 
 
 def main_solution(
-    *, heights, initial_conditions, a_0, σ_O_0, σ_P_0, σ_H_0, ρ_s, z_s,
+    *, heights, initial_conditions, a_0, σ_O_0, σ_P_0, σ_H_0, ρ_s,
     relative_tolerance=float_type(1e-6), absolute_tolerance=float_type(1e-10),
     max_steps=500, onroot_func=None, tstop=None, ontstop_func=None,
     root_func=None, root_func_args=None
@@ -106,7 +106,7 @@ def main_solution(
             raise SolverError("Need to specify size of root array")
 
     system = ode_system(
-        a_0=a_0, σ_O_0=σ_O_0, σ_P_0=σ_P_0, σ_H_0=σ_H_0, ρ_s=ρ_s, z_s=z_s,
+        a_0=a_0, σ_O_0=σ_O_0, σ_P_0=σ_P_0, σ_H_0=σ_H_0, ρ_s=ρ_s,
     )
 
     solver = ode(
@@ -162,14 +162,13 @@ def solution(
     σ_P_0 = initial_conditions.σ_P_0
     σ_H_0 = initial_conditions.σ_H_0
     ρ_s = initial_conditions.ρ_s
-    z_s = initial_conditions.z_s
     absolute_tolerance = soln_input.absolute_tolerance
     relative_tolerance = soln_input.relative_tolerance
     max_steps = soln_input.max_steps
 
     soln = main_solution(
         heights=heights, initial_conditions=init_con, a_0=a_0, σ_O_0=σ_O_0,
-        σ_P_0=σ_P_0, σ_H_0=σ_H_0, ρ_s=ρ_s, z_s=z_s,
+        σ_P_0=σ_P_0, σ_H_0=σ_H_0, ρ_s=ρ_s,
         relative_tolerance=relative_tolerance,
         absolute_tolerance=absolute_tolerance, max_steps=max_steps,
         onroot_func=onroot_func, tstop=tstop, ontstop_func=ontstop_func,

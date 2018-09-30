@@ -26,6 +26,19 @@ def _initial_load(group):
     )
 
 
+@ds_registry.loader("InitialConditions", version=2)
+def _initial_load2(group):
+    return InitialConditions(
+        a_0=group.attrs["a_0"],
+        σ_O_0=group.attrs["σ_O_0"],
+        σ_P_0=group.attrs["σ_P_0"],
+        σ_H_0=group.attrs["σ_H_0"],
+        ρ_s=group.attrs["ρ_s"],
+        init_con=group.attrs["init_con"],
+        heights=group["heights"]["data"],
+    )
+
+
 @ds_registry.loader("Solution", version=1)
 def _solution_loader_(group):
     if group["t_roots"] is None:
@@ -68,6 +81,25 @@ def _config_loader(group):
     )
 
 
+@ds_registry.loader("ConfigInput", version=2)
+def _config_loader2(group):
+    return ConfigInput(
+        start=group.attrs["start"],
+        stop=group.attrs["stop"],
+        max_steps=group.attrs["max_steps"],
+        num_heights=group.attrs["num_heights"],
+        label=group.attrs["label"],
+        relative_tolerance=group.attrs["relative_tolerance"],
+        absolute_tolerance=group.attrs["absolute_tolerance"],
+        v_rin_on_c_s=group.attrs["v_rin_on_c_s"],
+        v_a_on_c_s=group.attrs["v_a_on_c_s"],
+        σ_O_0=group.attrs["σ_O_0"],
+        σ_P_0=group.attrs["σ_P_0"],
+        σ_H_0=group.attrs["σ_H_0"],
+        ρ_s=group.attrs["ρ_s"],
+    )
+
+
 @ds_registry.loader("SolutionInput", version=1)
 def _input_loader(group):
     return SolutionInput(
@@ -84,6 +116,24 @@ def _input_loader(group):
         σ_H_0=group.attrs["σ_H_0"],
         ρ_s=group.attrs["ρ_s"],
         z_s=group.attrs["z_s"],
+    )
+
+
+@ds_registry.loader("SolutionInput", version=2)
+def _input_loader2(group):
+    return SolutionInput(
+        start=group.attrs["start"],
+        stop=group.attrs["stop"],
+        max_steps=group.attrs["max_steps"],
+        num_heights=group.attrs["num_heights"],
+        relative_tolerance=group.attrs["relative_tolerance"],
+        absolute_tolerance=group.attrs["absolute_tolerance"],
+        v_rin_on_c_s=group.attrs["v_rin_on_c_s"],
+        v_a_on_c_s=group.attrs["v_a_on_c_s"],
+        σ_O_0=group.attrs["σ_O_0"],
+        σ_P_0=group.attrs["σ_P_0"],
+        σ_H_0=group.attrs["σ_H_0"],
+        ρ_s=group.attrs["ρ_s"],
     )
 
 

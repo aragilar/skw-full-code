@@ -29,7 +29,6 @@ def define_conditions(inp):
     σ_P_0 = inp.σ_P_0
     σ_H_0 = inp.σ_H_0
     ρ_s = inp.ρ_s
-    z_s = inp.z_s
 
     σ_perp_sq = σ_P_0 ** 2 + σ_H_0 ** 2
     w_φ = - σ_H_0 / σ_P_0 * ε / 4 - a_0 ** 2 * σ_perp_sq * ε / (2 * σ_P_0)
@@ -48,7 +47,7 @@ def define_conditions(inp):
 
     return InitialConditions(
         heights=heights, init_con=init_con, a_0=a_0, σ_O_0=σ_O_0,
-        σ_P_0=σ_P_0, σ_H_0=σ_H_0, ρ_s=ρ_s, z_s=z_s,
+        σ_P_0=σ_P_0, σ_H_0=σ_H_0, ρ_s=ρ_s,
     )
 
 
@@ -79,7 +78,6 @@ def get_input_from_conffile(*, config_file, overrides=None):
         σ_P_0=config.get("initial", "σ_P_0", fallback="3"),
         σ_H_0=config.get("initial", "σ_H_0", fallback="4"),
         ρ_s=config.get("initial", "ρ_s", fallback="1e-6"),
-        z_s=config.get("initial", "z_s", fallback="40"),
     ))
 
 
@@ -100,5 +98,4 @@ def config_input_to_soln_input(inp):
         σ_P_0=float_type(str_to_float(inp.σ_P_0)),
         σ_H_0=float_type(str_to_float(inp.σ_H_0)),
         ρ_s=float_type(str_to_float(inp.ρ_s)),
-        z_s=float_type(str_to_float(inp.z_s)),
     )

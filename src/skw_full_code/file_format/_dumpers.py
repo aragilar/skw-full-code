@@ -11,7 +11,7 @@ from ._utils import ds_registry
 
 # pylint: disable=missing-docstring
 
-@ds_registry.dumper(InitialConditions, "InitialConditions", version=1)
+@ds_registry.dumper(InitialConditions, "InitialConditions", version=2)
 def _initial_dump(initial_conditions):
     return GroupContainer(
         attrs={
@@ -20,7 +20,6 @@ def _initial_dump(initial_conditions):
             "σ_P_0": initial_conditions.σ_P_0,
             "σ_H_0": initial_conditions.σ_H_0,
             "ρ_s": initial_conditions.ρ_s,
-            "z_s": initial_conditions.z_s,
             "init_con": initial_conditions.init_con,
         }, heights=initial_conditions.heights,
     )
@@ -41,7 +40,7 @@ def _solution_dumper(solution):
     )
 
 
-@ds_registry.dumper(ConfigInput, "ConfigInput", version=1)
+@ds_registry.dumper(ConfigInput, "ConfigInput", version=2)
 def _config_dumper(config_input):
     return GroupContainer(
         attrs={
@@ -58,12 +57,11 @@ def _config_dumper(config_input):
             "σ_P_0": config_input.σ_P_0,
             "σ_H_0": config_input.σ_H_0,
             "ρ_s": config_input.ρ_s,
-            "z_s": config_input.z_s,
-        }
+        },
     )
 
 
-@ds_registry.dumper(SolutionInput, "SolutionInput", version=1)
+@ds_registry.dumper(SolutionInput, "SolutionInput", version=2)
 def _input_dumper(solution_input):
     return GroupContainer(
         attrs={
@@ -79,8 +77,7 @@ def _input_dumper(solution_input):
             "σ_P_0": solution_input.σ_P_0,
             "σ_H_0": solution_input.σ_H_0,
             "ρ_s": solution_input.ρ_s,
-            "z_s": solution_input.z_s,
-        }
+        },
     )
 
 
