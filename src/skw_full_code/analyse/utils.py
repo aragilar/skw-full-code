@@ -8,15 +8,19 @@ from os import fspath
 import sys
 
 from logbook.compat import redirected_warnings, redirected_logging
+
+from numpy import zeros, log
 from matplotlib.colors import TABLEAU_COLORS, XKCD_COLORS
 import matplotlib.pyplot as plt
 
 from h5preserve import open as h5open
 
-from .. import __version__ as ds_version
+from disc_solver.utils import ODEIndex as DS_ODEIndex
+
+from .. import __version__ as skw_version
 from ..file_format import registries
 from ..logging import log_handler, logging_options
-from ..utils import str_to_float, get_solutions, SKWError
+from ..utils import str_to_float, get_solutions, SKWError, ODEIndex
 
 
 def single_solution_plotter(func):
@@ -104,7 +108,8 @@ def analyse_main_wrapper(
                 argument_default=argparse.SUPPRESS,
             )
             parser.add_argument(
-                '--version', action='version', version='%(prog)s ' + ds_version
+                '--version', action='version',
+                version='%(prog)s ' + skw_version
             )
             parser.add_argument("soln_file")
             parser.add_argument("soln_range")
@@ -151,7 +156,8 @@ def analyse_multisolution_wrapper(
                 argument_default=argparse.SUPPRESS,
             )
             parser.add_argument(
-                '--version', action='version', version='%(prog)s ' + ds_version
+                '--version', action='version',
+                version='%(prog)s ' + skw_version
             )
             parser.add_argument("soln_file")
             logging_options(parser)
@@ -217,3 +223,18 @@ def plot_output_wrapper(
         plt.close(fig)
         return None
     return fig
+
+
+def convert_ds_solution_to_skw(solution, c_s_on_v_k):
+    """
+    Convert a solution from disc-solver to skw variables.
+    """
+    skw_solution = zeros([solution.shape[0], len(ODEIndex)])
+    skw_solution[:, ODEIndex.w_r] = solution[:, DS_ODEIndex.v_r]
+    skw_solution[:, ODEIndex.w_φ] = solution[:, DS_ODEIndex.v_φ] - (
+        1 / c_s_on_v_k
+    )
+    skw_solution[:, ODEIndex.b_r] = solution[:, DS_ODEIndex.B_r]
+    skw_solution[:, ODEIndex.b_φ] = solution[:, DS_ODEIndex.B_φ]
+    skw_solution[:, ODEIndex.ln_ρ] = log(solution[:, DS_ODEIndex.ρ])
+    return skw_solution

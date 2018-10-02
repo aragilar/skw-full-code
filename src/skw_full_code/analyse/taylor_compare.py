@@ -2,20 +2,20 @@
 """
 Plot command for DiscSolver
 """
-from numpy import zeros, log, outer, ones, newaxis, arcsin
+from numpy import zeros, outer, ones, newaxis, arcsin
 import matplotlib.pyplot as plt
 
 from disc_solver.file_format import SolutionInput as DSSolutionInput
 from disc_solver.solve.taylor_space import (
     compute_taylor_values as ds_compute_taylor_values,
 )
-from disc_solver.utils import ODEIndex as DS_ODEIndex
 
 from ..utils import ODEIndex
 
 from .utils import (
     single_solution_plotter, analyse_main_wrapper, analysis_func_wrapper,
     common_plotting_options, get_common_plot_args, plot_output_wrapper,
+    convert_ds_solution_to_skw,
 )
 
 plt.style.use("bmh")
@@ -167,6 +167,9 @@ def compute_taylor(skw_config, heights, c_s_on_v_k=0.05, γ=1e-7):
     angles = arcsin(heights * c_s_on_v_k)
 
     def sum_taylor(coef, count=0):
+        """
+        Recursive function to compute taylor series for angles
+        """
         if not coef:
             return zeros(angles.shape)
         if len(coef) == 1:
@@ -175,17 +178,6 @@ def compute_taylor(skw_config, heights, c_s_on_v_k=0.05, γ=1e-7):
         return (
             sum_taylor(coef[1:], count=count+1) * angles[:, newaxis] + coef[0]
         ) / divisor
-
-    def convert_ds_solution(solution):
-        skw_solution = zeros([solution.shape[0], len(ODEIndex)])
-        skw_solution[:, ODEIndex.w_r] = solution[:, DS_ODEIndex.v_r]
-        skw_solution[:, ODEIndex.w_φ] = solution[:, DS_ODEIndex.v_φ] - (
-            1 / c_s_on_v_k
-        )
-        skw_solution[:, ODEIndex.b_r] = solution[:, DS_ODEIndex.B_r]
-        skw_solution[:, ODEIndex.b_φ] = solution[:, DS_ODEIndex.B_φ]
-        skw_solution[:, ODEIndex.ln_ρ] = log(solution[:, DS_ODEIndex.ρ])
-        return skw_solution
 
     σ_O_0 = skw_config.σ_O_0
     σ_P_0 = skw_config.σ_P_0
@@ -218,6 +210,7 @@ def compute_taylor(skw_config, heights, c_s_on_v_k=0.05, γ=1e-7):
         γ=γ,
         c_s_on_v_k=c_s_on_v_k,
     )
-    return convert_ds_solution(
-        sum_taylor(ds_compute_taylor_values(ds_soln_input))
+    return convert_ds_solution_to_skw(
+        sum_taylor(ds_compute_taylor_values(ds_soln_input)),
+        c_s_on_v_k=c_s_on_v_k,
     )
