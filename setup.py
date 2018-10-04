@@ -43,6 +43,7 @@ setuptools.setup(
             'skw-full-soln = skw_full_code.solve:main',
             'skw-full-info = skw_full_code.analyse.info:info_main',
             'skw-full-plot = skw_full_code.analyse.plot:plot_main',
+            'skw-full-compare-plot = skw_full_code.analyse.compare_plot:plot_main',
             'skw-full-taylor-compare-plot = skw_full_code.analyse.taylor_compare:plot_main',
         ],
     },
