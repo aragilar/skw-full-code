@@ -2,7 +2,7 @@
 """
 Plot command for DiscSolver
 """
-from numpy import zeros, outer, ones, newaxis, arcsin
+from numpy import zeros, outer, ones, newaxis
 import matplotlib.pyplot as plt
 
 from disc_solver.file_format import SolutionInput as DSSolutionInput
@@ -15,7 +15,7 @@ from ..utils import ODEIndex
 from .utils import (
     single_solution_plotter, analyse_main_wrapper, analysis_func_wrapper,
     common_plotting_options, get_common_plot_args, plot_output_wrapper,
-    convert_ds_solution_to_skw,
+    convert_ds_solution_to_skw, heights_to_angles
 )
 
 plt.style.use("bmh")
@@ -164,7 +164,7 @@ def compute_taylor(skw_config, heights, c_s_on_v_k=0.05, γ=1e-7):
     """
     Compute solution based on taylor series from disc-solver
     """
-    angles = arcsin(heights * c_s_on_v_k)
+    angles = heights_to_angles(heights, c_s_on_v_k)
 
     def sum_taylor(coef, count=0):
         """

@@ -10,7 +10,8 @@ from ..utils import ODEIndex
 from .utils import (
     multiple_solution_plotter, analyse_main_wrapper_multisolution,
     analysis_func_wrapper_multisolution, common_plotting_options,
-    get_common_plot_args, plot_output_wrapper,
+    get_common_plot_args, plot_output_wrapper, angles_to_heights,
+    convert_ds_solution_to_skw,
 )
 
 plt.style.use("bmh")
@@ -90,36 +91,47 @@ def generate_plot(
 
     for id_num, soln in enumerate(solns):
         solution = soln.solution
-        heights = soln.heights
-        cons = soln.initial_conditions
+        if hasattr(soln, "heights"):
+            heights = soln.heights
+            cons = soln.initial_conditions
+            B_r = solution[:, ODEIndex.b_r]
+            B_φ = solution[:, ODEIndex.b_φ]
+            v_r = solution[:, ODEIndex.w_r]
+            v_φ_v_k = solution[:, ODEIndex.w_φ]
+            v_z = cons.ρ_s / exp(solution[:, ODEIndex.ln_ρ])
+            log_ρ = solution[:, ODEIndex.ln_ρ]
+        else:
+            inp = soln.inp
+            heights = angles_to_heights(soln.angles, inp.c_s_on_v_k)
+            solution = convert_ds_solution_to_skw(solution, inp.c_s_on_v_k)
 
         indexes = heights <= stop
 
         param_names = [
             {
                 "name": "$B_r/B_0$",
-                "data": solution[:, ODEIndex.b_r],
+                "data": B_r,
             },
             {
                 "name": "$B_φ/B_0$",
-                "data": solution[:, ODEIndex.b_φ],
+                "data": B_φ,
             },
             {
                 "name": "$v_r/c_s$",
-                "data": solution[:, ODEIndex.w_r],
+                "data": v_r,
             },
             {
                 "name": "$(v_φ - v_k)/c_s$",
-                "data": solution[:, ODEIndex.w_φ],
+                "data": v_φ_v_k,
             },
             {
                 "name": "$v_z/c_s$",
-                "data": cons.ρ_s / exp(solution[:, ODEIndex.ln_ρ]),
+                "data": v_z,
                 "scale": v_z_scale,
             },
             {
                 "name": "$log(ρ/ρ_0)$",
-                "data": solution[:, ODEIndex.ln_ρ],
+                "data": log_ρ,
             },
         ]
 

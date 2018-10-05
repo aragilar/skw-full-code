@@ -9,18 +9,21 @@ import sys
 
 from logbook.compat import redirected_warnings, redirected_logging
 
-from numpy import zeros, log
+from numpy import zeros, log, sin, arcsin
 from matplotlib.colors import TABLEAU_COLORS, XKCD_COLORS
 import matplotlib.pyplot as plt
 
 from h5preserve import open as h5open
 
+from disc_solver.file_format import registries as ds_registries
 from disc_solver.utils import ODEIndex as DS_ODEIndex
 
 from .. import __version__ as skw_version
 from ..file_format import registries
 from ..logging import log_handler, logging_options
 from ..utils import str_to_float, get_solutions, SKWError, ODEIndex
+
+ds_and_skw_registries = registries + ds_registries
 
 
 def single_solution_plotter(func):
@@ -85,7 +88,7 @@ def analysis_func_wrapper_multisolution(func):
         """
         def file_loader(pairs):
             for filename, index_str in pairs:
-                with h5open(filename, registries) as soln_file:
+                with h5open(filename, ds_and_skw_registries) as soln_file:
                     yield soln_file["run"], index_str
         return func(file_loader(solutions_pairs), *args, **kwargs)
 
@@ -331,3 +334,17 @@ def convert_ds_solution_to_skw(solution, c_s_on_v_k):
     skw_solution[:, ODEIndex.b_φ] = solution[:, DS_ODEIndex.B_φ]
     skw_solution[:, ODEIndex.ln_ρ] = log(solution[:, DS_ODEIndex.ρ])
     return skw_solution
+
+
+def heights_to_angles(heights, c_s_on_v_k):
+    """
+    Convert heights in skw space to angles in disc-solver space.
+    """
+    return arcsin(heights * c_s_on_v_k)
+
+
+def angles_to_heights(angles, c_s_on_v_k):
+    """
+    Convert angles in disc-solver space to heights in skw space.
+    """
+    return sin(angles) / c_s_on_v_k
