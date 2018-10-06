@@ -9,7 +9,7 @@ import sys
 
 from logbook.compat import redirected_warnings, redirected_logging
 
-from numpy import zeros, log, sin, arcsin
+from numpy import zeros, log, sin, arcsin, sqrt
 from matplotlib.colors import TABLEAU_COLORS, XKCD_COLORS
 import matplotlib.pyplot as plt
 
@@ -21,7 +21,7 @@ from disc_solver.utils import ODEIndex as DS_ODEIndex
 from .. import __version__ as skw_version
 from ..file_format import registries
 from ..logging import log_handler, logging_options
-from ..utils import str_to_float, get_solutions, SKWError, ODEIndex
+from ..utils import str_to_float, get_solutions, SKWError
 
 ds_and_skw_registries = registries + ds_registries
 
@@ -321,18 +321,22 @@ def plot_output_wrapper(
     return fig
 
 
-def convert_ds_solution_to_skw(solution, c_s_on_v_k):
+def convert_ds_solution_to_skw(solution, *, c_s_on_v_k, γ, heights):
     """
     Convert a solution from disc-solver to skw variables.
     """
-    skw_solution = zeros([solution.shape[0], len(ODEIndex)])
-    skw_solution[:, ODEIndex.w_r] = solution[:, DS_ODEIndex.v_r]
-    skw_solution[:, ODEIndex.w_φ] = solution[:, DS_ODEIndex.v_φ] - (
+    scale_factor = sqrt(1 + heights ** 2 * c_s_on_v_k ** 2)
+    v_scale = 1 / sqrt(scale_factor)
+    B_scale = scale_factor ** (γ - 5 / 4)
+    ρ_scale = scale_factor ** (2 * γ - 3 / 2)
+    skw_solution = zeros(solution.shape)
+    skw_solution[:, DS_ODEIndex.v_r] = v_scale * solution[:, DS_ODEIndex.v_r]
+    skw_solution[:, DS_ODEIndex.v_φ] = solution[:, DS_ODEIndex.v_φ] - (
         1 / c_s_on_v_k
-    )
-    skw_solution[:, ODEIndex.b_r] = solution[:, DS_ODEIndex.B_r]
-    skw_solution[:, ODEIndex.b_φ] = solution[:, DS_ODEIndex.B_φ]
-    skw_solution[:, ODEIndex.ln_ρ] = log(solution[:, DS_ODEIndex.ρ])
+    ) * v_scale
+    skw_solution[:, DS_ODEIndex.B_r] = B_scale * solution[:, DS_ODEIndex.B_r]
+    skw_solution[:, DS_ODEIndex.B_φ] = B_scale * solution[:, DS_ODEIndex.B_φ]
+    skw_solution[:, DS_ODEIndex.ρ] = log(ρ_scale * solution[:, DS_ODEIndex.ρ])
     return skw_solution
 
 

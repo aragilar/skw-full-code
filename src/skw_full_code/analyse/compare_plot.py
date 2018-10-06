@@ -5,6 +5,8 @@ Plot command for DiscSolver
 from numpy import exp
 import matplotlib.pyplot as plt
 
+from disc_solver.utils import ODEIndex as DS_ODEIndex
+
 from ..utils import ODEIndex
 
 from .utils import (
@@ -101,9 +103,17 @@ def generate_plot(
             v_z = cons.ρ_s / exp(solution[:, ODEIndex.ln_ρ])
             log_ρ = solution[:, ODEIndex.ln_ρ]
         else:
-            inp = soln.inp
+            inp = soln.solution_input
             heights = angles_to_heights(soln.angles, inp.c_s_on_v_k)
-            solution = convert_ds_solution_to_skw(solution, inp.c_s_on_v_k)
+            solution = convert_ds_solution_to_skw(
+                solution, c_s_on_v_k=inp.c_s_on_v_k, γ=inp.γ, heights=heights,
+            )
+            v_r = solution[:, DS_ODEIndex.v_r]
+            v_φ_v_k = solution[:, DS_ODEIndex.v_φ]
+            v_z = solution[:, DS_ODEIndex.v_θ]
+            B_r = solution[:, DS_ODEIndex.B_r]
+            B_φ = solution[:, DS_ODEIndex.B_φ]
+            log_ρ = solution[:, DS_ODEIndex.ρ]
 
         indexes = heights <= stop
 

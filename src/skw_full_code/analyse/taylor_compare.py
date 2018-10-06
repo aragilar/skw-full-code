@@ -2,10 +2,11 @@
 """
 Plot command for DiscSolver
 """
-from numpy import zeros, outer, ones, newaxis
+from numpy import zeros, outer, ones, newaxis, exp
 import matplotlib.pyplot as plt
 
 from disc_solver.file_format import SolutionInput as DSSolutionInput
+from disc_solver.utils import ODEIndex as DS_ODEIndex
 from disc_solver.solve.taylor_space import (
     compute_taylor_values as ds_compute_taylor_values,
 )
@@ -91,39 +92,44 @@ def generate_plot(
 
     solution = soln.solution
     heights = soln.heights
+    cons = soln.initial_conditions
 
     indexes = heights <= stop
 
     taylor_solutions = compute_taylor(
         soln.solution_input, heights, γ=γ, c_s_on_v_k=c_s_on_v_k,
     )
-    diff_solution = solution - taylor_solutions
 
     param_names = [
         {
             "name": "$B_r/B_0$",
-            "data": diff_solution[:, ODEIndex.b_r],
-            "index": ODEIndex.b_r,
+            "taylor index": DS_ODEIndex.B_r,
+            "skw": solution[:, ODEIndex.b_r]
         },
         {
             "name": "$B_φ/B_0$",
-            "data": diff_solution[:, ODEIndex.b_φ],
-            "index": ODEIndex.b_φ,
+            "taylor index": DS_ODEIndex.B_φ,
+            "skw": solution[:, ODEIndex.b_φ]
         },
         {
             "name": "$v_r/c_s$",
-            "data": diff_solution[:, ODEIndex.w_r],
-            "index": ODEIndex.w_r,
+            "taylor index": DS_ODEIndex.v_r,
+            "skw": solution[:, ODEIndex.w_r]
+        },
+        {
+            "name": "$v_z/c_s$",
+            "taylor index": DS_ODEIndex.v_θ,
+            "skw": cons.ρ_s / exp(solution[:, ODEIndex.ln_ρ]),
         },
         {
             "name": "$(v_φ - v_k)/c_s$",
-            "data": diff_solution[:, ODEIndex.w_φ],
-            "index": ODEIndex.w_φ,
+            "taylor index": DS_ODEIndex.v_φ,
+            "skw": solution[:, ODEIndex.w_φ]
         },
         {
             "name": "$log(ρ/ρ_0)$",
-            "data": diff_solution[:, ODEIndex.ln_ρ],
-            "index": ODEIndex.ln_ρ,
+            "taylor index": DS_ODEIndex.ρ,
+            "skw": solution[:, ODEIndex.ln_ρ]
         },
     ]
 
@@ -141,19 +147,20 @@ def generate_plot(
         ax = axes[i]
         if show_both:
             ax.plot(
-                heights[indexes],
-                solution[indexes, settings["index"]], linestyle, label="SKW"
+                heights[indexes], settings["skw"][indexes], linestyle,
+                label="SKW"
             )
             ax.plot(
-                heights[indexes],
-                taylor_solutions[indexes, settings["index"]], linestyle,
-                label="Taylor"
+                heights[indexes], taylor_solutions[
+                    indexes, settings["taylor index"]
+                ], linestyle, label="Taylor"
             )
             ax.legend(loc=0)
         else:
             ax.plot(
-                heights[indexes],
-                settings["data"][indexes], linestyle, label=settings["name"]
+                heights[indexes], settings["skw"][indexes] - taylor_solutions[
+                    indexes, settings["taylor index"]
+                ], linestyle, label=settings["name"]
             )
         ax.set_ylabel(settings["name"])
         ax.set_yscale(settings.get("scale", "linear"))
@@ -212,5 +219,5 @@ def compute_taylor(skw_config, heights, c_s_on_v_k=0.05, γ=1e-7):
     )
     return convert_ds_solution_to_skw(
         sum_taylor(ds_compute_taylor_values(ds_soln_input)),
-        c_s_on_v_k=c_s_on_v_k,
+        c_s_on_v_k=c_s_on_v_k, γ=γ, heights=heights
     )
