@@ -334,6 +334,7 @@ def convert_ds_solution_to_skw(solution, *, c_s_on_v_k, γ, heights):
     skw_solution[:, DS_ODEIndex.v_φ] = solution[:, DS_ODEIndex.v_φ] - (
         1 / c_s_on_v_k
     ) * v_scale
+    skw_solution[:, DS_ODEIndex.v_θ] = v_scale * solution[:, DS_ODEIndex.v_θ]
     skw_solution[:, DS_ODEIndex.B_r] = B_scale * solution[:, DS_ODEIndex.B_r]
     skw_solution[:, DS_ODEIndex.B_φ] = B_scale * solution[:, DS_ODEIndex.B_φ]
     skw_solution[:, DS_ODEIndex.ρ] = log(ρ_scale * solution[:, DS_ODEIndex.ρ])
