@@ -163,7 +163,7 @@ def generate_plot(
 
     # only add label to bottom plots
     for ax in axes[1]:
-        ax.set_xlabel("z/h")
+        ax.set_xlabel("height from plane ($z/h$)")
 
     axes.shape = len(param_names)
     for i, settings in enumerate(param_names):

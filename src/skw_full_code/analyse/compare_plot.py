@@ -88,7 +88,7 @@ def generate_plot(
 
     # only add label to bottom plots
     for ax in axes[1]:
-        ax.set_xlabel("angle from plane (°)")
+        ax.set_xlabel("height from plane ($z/h$)")
     axes = axes.flatten()
 
     for id_num, soln in enumerate(solns):
