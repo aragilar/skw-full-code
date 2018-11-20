@@ -20,7 +20,7 @@ setuptools.setup(
         "h5preserve>=0.17.1",
         "stringtopy",
         "attrs",
-        "disc-solver>=0.1.1",
+        "disc-solver>=0.3",
     ],
     author = "James Tocknell",
     author_email = "aragilar@gmail.com",
