@@ -56,6 +56,7 @@ orbs:
           - run: python3 -m pip install -U pip setuptools wheel
           - run: python3 -m pip install -c known_broken_constraints.txt --pre -U coverage # coverage major versions need to match
           - run: python3 -m pip install -U tox codecov
+          - run: python3 -m pip install -c known_broken_constraints.txt -U cython
       tox_run:
         parameters:
           tox_name:
