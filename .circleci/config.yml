@@ -1,0 +1,139 @@
+version: 2.1
+
+orbs:
+  tox_orb:
+    jobs:
+      tox_job:
+        parameters:
+          tox_name:
+            type: string
+            default: py39
+          sundials_version:
+            type: string
+            default: 4.1.0
+          tox_args:
+            type: string
+            default: --
+        environment:
+          #SUNDIALS_VERSION: <<parameters.sundials_version>>
+        executor: tox_exec
+        steps:
+          - tox_pre
+          - tox_install
+          - tox_run:
+              tox_name: <<parameters.tox_name>>
+              tox_args: <<parameters.tox_args>>
+          - tox_post
+    commands:
+      tox_pre:
+        steps:
+          - checkout
+          - run: echo 'deb http://deb.debian.org/debian/ experimental main' >> /etc/apt/sources.list
+          - run: apt-get update
+          - run: apt-get dist-upgrade -y
+          - run: apt-get install -y git
+          - run: apt-get install -y ca-certificates
+          #
+          - run: apt-get install -y python3-dev
+          - run: apt-get install -y python3-tk
+          - run: apt-get install -y python3-pip
+          #
+          - run: apt-get install -y libsundials-dev # scikits.odes
+          - run: apt-get install -y libhdf5-dev # h5py
+          - run: apt-get install -y libgirepository1.0-dev # matplotlib/pygobject
+          - run: apt-get install -y libgtk-3-dev # matplotlib/pygobject
+          #
+          - run: apt-get install -y xvfb # headless testing
+          - restore_cache:
+              keys:
+              - pip-
+          - run: pwd
+          - run: env
+      tox_install:
+        steps:
+          - run: cp ci_support/_manylinux.py /usr/lib/python3/dist-packages/_manylinux.py
+          #
+          - run: python3 -m pip install -U pip setuptools wheel
+          - run: python3 -m pip install -c known_broken_constraints.txt --pre -U coverage # coverage major versions need to match
+          - run: python3 -m pip install -U tox codecov
+          - run: python3 -m pip install --no-binary :all: -c known_broken_constraints.txt -U cython
+      tox_run:
+        parameters:
+          tox_name:
+            type: string
+            default: py39
+          tox_args:
+            type: string
+            default: --
+        steps:
+          - run:
+              no_output_timeout: 1.5h
+              command: tox -e <<parameters.tox_name>> <<parameters.tox_args>>
+
+      tox_post:
+        steps:
+          - run:
+              command: df -h
+              when: always
+          - run: codecov
+          - save_cache:
+              key: pip-{{ epoch }}
+              paths:
+                - /home/circleci/.cache/pip
+                - /root/.cache/pip
+
+    executors:
+      tox_exec:
+        parameters:
+          version:
+            type: string
+            default: "3.8"
+        docker:
+          - image: debian:unstable
+
+workflows:
+  version: 2
+  commit:
+    jobs:
+      - tox_orb/tox_job:
+          name: py39
+          tox_name: py39
+          tox_args: -- -n 2
+      - tox_orb/tox_job:
+          name: flake8
+          tox_name: flake8
+      - tox_orb/tox_job:
+          name: pylint
+          tox_name: pylint
+      - tox_orb/tox_job:
+          name: check-manifest
+          tox_name: check-manifest
+      - tox_orb/tox_job:
+          name: checkreadme
+          tox_name: checkreadme
+
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - tox_orb/tox_job:
+          name: py39
+          tox_name: py39
+          tox_args: -- -n 2
+      - tox_orb/tox_job:
+          name: flake8
+          tox_name: flake8
+      - tox_orb/tox_job:
+          name: pylint
+          tox_name: pylint
+      - tox_orb/tox_job:
+          name: check-manifest
+          tox_name: check-manifest
+      - tox_orb/tox_job:
+          name: checkreadme
+          tox_name: checkreadme
